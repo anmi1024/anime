@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.anmi.mapper.UserMapper">
+    <resultMap type="com.anmi.model.User" id="userResultMap">
+        <result column="PK_ID" property="pkId"  />
+        <result column="USERNAME" property="userName"  />
+        <result column="PASSWORD" property="passWord"  />
+        <result column="NAME" property="name"  />
+        <result column="DELTAG" property="delTag"  />
+    </resultMap>
+
+    <select id="getAll" resultMap="userResultMap">
+        SELECT * FROM gafis_authorize_user
+    </select>
+
+</mapper>

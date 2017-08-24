@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="taskInfo" type="taskInfo"/>
+
+  <xs:complexType name="taskInfo">
+    <xs:sequence>
+      <xs:element name="jsdw_gajgmc" type="xs:string" minOccurs="0"/>
+      <xs:element name="jsdw_gajgjgdm" type="xs:string" minOccurs="0"/>
+      <xs:element name="fsr_lxdm" type="xs:string" minOccurs="0"/>
+      <xs:element name="fsr_gmsfhm" type="xs:string" minOccurs="0"/>
+      <xs:element name="fsr_xm" type="xs:string" minOccurs="0"/>
+      <xs:element name="fsdw_xtlx" type="xs:string" minOccurs="0"/>
+      <xs:element name="fsdw_gajgmc" type="xs:string" minOccurs="0"/>
+      <xs:element name="fsdw_gajgjgdm" type="xs:string" minOccurs="0"/>
+      <xs:element name="fssj" type="xs:string" minOccurs="0"/>
+      <xs:element name="CancelLatentNum" type="xs:int"/>
+      <xs:element name="LLResultNum" type="xs:int"/>
+      <xs:element name="TTResultNum" type="xs:int"/>
+      <xs:element name="TLResultNum" type="xs:int"/>
+      <xs:element name="LTResultNum" type="xs:int"/>
+      <xs:element name="printTaskNum" type="xs:int"/>
+      <xs:element name="latentTaskNum" type="xs:int"/>
+      <xs:element name="LLHitResultNum" type="xs:int"/>
+      <xs:element name="TTHitResultNum" type="xs:int"/>
+      <xs:element name="LTHitResultNum" type="xs:int"/>
+      <xs:element name="LatentNum" type="xs:int"/>
+      <xs:element name="fingerprintNum" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+
