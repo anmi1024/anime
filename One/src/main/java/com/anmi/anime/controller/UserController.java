@@ -1,7 +1,6 @@
 package com.anmi.anime.controller;
 
-import com.anmi.anime.domain.authorize.model.User;
-import com.anmi.anime.domain.authorize_gz.model.UserGZ;
+import com.anmi.anime.model.User;
 import com.anmi.anime.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,7 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping("/showAllUser")
-    public List<UserGZ> getAllUser(){
+    public List<User> getAllUser(){
         return userService.getAll();
     }
     @RequestMapping("/showAllUserByPageable")

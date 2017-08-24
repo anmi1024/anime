@@ -1,4 +1,4 @@
-package com.anmi.anime.domain.authorize.model;
+package com.anmi.anime.model;
 
 import javax.persistence.*;
 import java.io.Serializable;

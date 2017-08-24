@@ -1,9 +1,8 @@
 package com.anmi.anime.serviceImpl;
 
 import com.anmi.anime.domain.authorize.repository.UserRepository;
-import com.anmi.anime.domain.authorize_gz.model.UserGZ;
 import com.anmi.anime.domain.authorize_gz.repository.UserGZRepository;
-import com.anmi.anime.domain.authorize.model.User;
+import com.anmi.anime.model.User;
 import com.anmi.anime.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,8 +24,8 @@ public class UserServiceImpl implements UserService {
     private UserGZRepository userGZRepository;
 
     @Override
-    public List<UserGZ> getAll() {
-        List<UserGZ> userList = userGZRepository.findAll();
+    public List<User> getAll() {
+        List<User> userList = userGZRepository.findAll();
         return userList;
     }
 

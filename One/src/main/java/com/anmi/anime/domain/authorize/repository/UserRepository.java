@@ -1,6 +1,6 @@
 package com.anmi.anime.domain.authorize.repository;
 
-import com.anmi.anime.domain.authorize.model.User;
+import com.anmi.anime.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

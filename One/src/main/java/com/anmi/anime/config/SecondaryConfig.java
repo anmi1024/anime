@@ -21,11 +21,10 @@ import java.util.Map;
 @EnableJpaRepositories(
         entityManagerFactoryRef="entityManagerFactorySecondary",
         transactionManagerRef="transactionManagerSecondary",
-        basePackages= { "com.anmi.anime.domain.authorize_gz" }) //设置Repository所在位置
+        basePackages= { "com.anmi.anime.domain.authorize_gz.repository" }) //设置Repository所在位置
 public class SecondaryConfig {
 
-    @Autowired
-    @Qualifier("secondaryDataSource")
+    @Autowired @Qualifier("secondaryDataSource")
     private DataSource secondaryDataSource;
 
     @Bean(name = "entityManagerSecondary")
@@ -38,7 +37,7 @@ public class SecondaryConfig {
         return builder
                 .dataSource(secondaryDataSource)
                 .properties(getVendorProperties(secondaryDataSource))
-                .packages("com.didispace.domain.s") //设置实体类所在位置
+                .packages("com.anmi.anime.model") //设置实体类所在位置
                 .persistenceUnit("secondaryPersistenceUnit")
                 .build();
     }

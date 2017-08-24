@@ -1,6 +1,6 @@
 package com.anmi.anime.controller;
 
-import com.anmi.anime.domain.authorize.model.User;
+import com.anmi.anime.model.User;
 import com.anmi.anime.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
