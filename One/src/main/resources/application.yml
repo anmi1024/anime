@@ -1,20 +1,37 @@
 server:
   port: 8000
-  tomcat: uri-encoding:utf-8
+  tomcat:
+    uri-encoding: UTF-8
+multipart:
+    maxFileSize: 100MB
+    maxRequestSize: 300MB
 spring:
   datasource:
-    primary:
+    authorize:
       driverClassName: com.mysql.jdbc.Driver
       jdbcUrl: jdbc:mysql://10.1.7.151:3306/authorize
       username: root
       password: 123456
       maximumPoolSize: 5
-    secondary:
+    authorizeGZ:
       driverClassName: com.mysql.jdbc.Driver
       jdbcUrl: jdbc:mysql://10.1.7.151:3306/authorize_gz
       username: root
       password: 123456
       maximumPoolSize: 5
+    daku:
+      driverClassName: oracle.jdbc.driver.OracleDriver
+      jdbcUrl: jdbc:oracle:thin:@10.1.7.181:1521:gafisdb
+      username: gafis_sh_px
+      password: gafis
+      maximumPoolSize: 5
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  messages:
+    encoding: UTF-8
   thymeleaf:
    cache: false
    prefix: classpath:/templates/
@@ -22,6 +39,13 @@ spring:
    encoding: UTF-8
    content-type: text/html
    mode: HTML5
+  fpt:
+   imageUrl: http://10.1.7.204/image
+   extractorUrl: http://10.1.7.142:9001/extractor
+  hbase:
+   hbaseMaster: 10.1.7.181:60000
+   zooQuorum: 10.1.7.142
+   zooPort: 3334
 logging:
   file: /logging/anime/One/application.log
   pattern:
@@ -31,4 +55,6 @@ logging:
       root: ERROR
       org.springframework.web: ERROR
       org.hibernate: ERROR
-      com.anmi.anime: INFO
+      com.anmi.anime: ERROR
+      #org.hibernate.SQL: trace
+      #org.hibernate.type: trace

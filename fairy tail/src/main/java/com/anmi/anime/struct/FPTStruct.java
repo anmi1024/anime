@@ -83,7 +83,8 @@ public class FPTStruct {
             } else if (field.getType() == byte[].class) {
                 method.invoke(t, bytes);
             } else if (field.getType().getSuperclass() == BaseStruct.class) {
-                method.invoke(t,readFPTByteBuf(b, getInnerClassInstance(field.getType(), clazz)));
+                T t_o = readFPTByteBuf(b, getInnerClassInstance(field.getType(), clazz));
+                method.invoke(t,t_o);
             } else if (field.getType() == List.class) {
                 ParameterizedType p = (ParameterizedType) field.getGenericType();//获取泛型类型
                 Type[] types = p.getActualTypeArguments();

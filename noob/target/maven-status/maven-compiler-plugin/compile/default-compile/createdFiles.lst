@@ -1,0 +1,7 @@
+com\anmi\anime\model\User.class
+com\anmi\anime\serviceImpl\UserServiceImpl.class
+com\anmi\anime\domain\UserData.class
+com\anmi\anime\service\UserService.class
+com\anmi\anime\controller\ThymeleafController.class
+com\anmi\anime\ServletInitializer.class
+com\anmi\anime\App.class

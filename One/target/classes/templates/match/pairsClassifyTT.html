@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>对子查询</title>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap-theme.css"/>
+    <script type="text/javascript" src="/One/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/One/bootstrap3/js/bootstrap.js"></script>
+    <script th:inline="javascript">
+        var pairsClassifyList = [];
+        var sendKeyList = [];
+        var pageNum = 1;
+        var pageSendKeyNum = 1;
+        $(function(){
+            pairsClassifyList = [[${pairsClassifyList}]];
+            sendKeyList = [[${pairsClassifyVO.sendKeys}]];
+            if (sendKeyList == null) sendKeyList = [];
+            viewListPage(1);
+            viewSendKeyListPage(1);
+            $('#reset').click(function(){
+                $('#pairsQueryTable input[type="text"]').val("");
+            });
+            $('#addQueryQueue').click(function(){
+                for (key in pairsClassifyList) {
+                    if (sendKeyList.indexOf(pairsClassifyList[key].querykey) === -1)
+                        sendKeyList.push(pairsClassifyList[key].querykey);
+                }
+                $('#sendKeys').val(sendKeyList);
+                viewSendKeyListPage(1);
+            });
+
+            $('#clearQueryQueue').click(function(){
+                $('#queryQueueTable').html("");
+                $('#sendKeyTotal').text("总数:0");
+                sendKeyList = [];
+                $('#sendKeys').val("");
+            });
+        });
+
+        function delRow(obj) {
+            var tr = $(obj).parent().parent();
+            $(tr).remove();
+        }
+
+        function choicePage(type) {
+            var total = pairsClassifyList.length;
+            var pageCount = parseInt(total/10);
+            if (total%10 != 0)  pageCount = pageCount + 1;
+            if (type == "pre") {
+                if (pageNum > 1)  pageNum = pageNum -1;
+                else return false;
+            } else {
+                if (pageNum >= pageCount) return false;
+                else pageNum = pageNum + 1;
+            }
+            viewListPage(pageNum);
+        }
+
+        function viewListPage(currentPage) {
+            var pageTotal = 0;
+            if (currentPage > 1) pageTotal = (currentPage-1)*10;
+            var tr = "";
+            var nums = [0,1,2,3,4,5,6,7,8,9];
+            for (var i in nums)
+            {
+                var n = parseInt(i);
+                var index = n+pageTotal;
+                var pairsClassify = pairsClassifyList[parseInt(index)];
+                if (pairsClassify != null) {
+                    tr += "<tr><td>"+parseInt((n+1)+pageTotal)+"</td><td>"+pairsClassify.querykey+"</td><td>"+pairsClassify.matchkey+"</td><td>"+pairsClassify.score+"</td></tr>";
+                }
+            }
+            if (tr != "") {
+                $('#classifyTTTableBody').html(tr);
+                $('#ttTotal').text("总数:"+pairsClassifyList.length);
+            }
+        }
+
+        function choiceSendKeyPage(type) {
+            var total = sendKeyList.length;
+            var pageCount = parseInt(total/10);
+            if (total%10 != 0)  pageCount = pageCount + 1;
+            if (type == "pre") {
+                if (pageSendKeyNum > 1)  pageSendKeyNum = pageSendKeyNum -1;
+                else return false;
+            } else {
+                if (pageSendKeyNum >= pageCount) return false;
+                else pageSendKeyNum = pageSendKeyNum + 1;
+            }
+            viewSendKeyListPage(pageSendKeyNum);
+        }
+
+        function viewSendKeyListPage(currentPage) {
+            var pageTotal = 0;
+            if (currentPage > 1) pageTotal = (currentPage-1)*10;
+            var tr = "";
+            var nums = [0,1,2,3,4,5,6,7,8,9];
+            for (var i in nums)
+            {
+                var n = parseInt(i);
+                var index = n+pageTotal;
+                var sendKey = sendKeyList[parseInt(index)];
+                if (sendKey != null) {
+                    tr += '<tr><td>'+parseInt((n+1)+pageTotal)+'</td><td>'+sendKey+'</td><td><a href="javascript:void(0);" onclick="delRow(this)">删除</a></td></tr>';
+                }
+            }
+            if (tr != "") {
+                $('#queryQueueTable').html(tr);
+                $('#sendKeyTotal').text("总数:"+sendKeyList.length);
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="panel panel-success col-md-6">
+    <div class="panel-heading">
+        <h3 class="panel-title">对子查询</h3>
+    </div>
+    <div class="panel-body">
+        <form method="post" role="form" action="/One/classify/classifyTT">
+            <table class="table" id="pairsQueryTable">
+                <tr>
+                    <td>细节点个数平均值区间</td>
+                    <td><input type="text" id="mntCount" name="mntCount" size="5" th:value="${pairsClassifyVO.mntCount}"/>-<input type="text" id="mntCountLess" name="mntCountLess" size="5" th:value="${pairsClassifyVO.mntCountLess}"/></td>
+                    <td></td>
+                    <td> <input type="hidden" id="sendKeys" name="sendKeys"/> </td>
+                </tr>
+                <tr>
+                    <td>图像质量分平均值区间</td>
+                    <td><input type="text" id="imgqlev" name="imgqlev" size="5" th:value="${pairsClassifyVO.imgqlev}"/>-<input type="text" id="imgqlevLess" name="imgqlevLess" size="5" th:value="${pairsClassifyVO.imgqlevLess}"/></td>
+                    <td>特征质量分平均值区间</td>
+                    <td><input type="text" id="rpqlev" name="rpqlev" size="5" th:value="${pairsClassifyVO.rpqlev}"/>-<input type="text" id="rpqlevLess" name="rpqlevLess" size="5" th:value="${pairsClassifyVO.rpqlevLess}"/></td>
+                </tr>
+                <tr>
+                    <td>中心可靠度平均值区间</td>
+                    <td><input type="text" id="coreqlev" name="coreqlev" size="5" th:value="${pairsClassifyVO.coreqlev}"/>-<input type="text" id="coreqlevLess" name="coreqlevLess" size="5" th:value="${pairsClassifyVO.coreqlevLess}"/></td>
+                    <td>副中心可靠度平均值区间</td>
+                    <td><input type="text" id="vcoreqlev" name="vcoreqlev" size="5" th:value="${pairsClassifyVO.vcoreqlev}"/>-<input type="text" id="vcoreqlevLess" name="vcoreqlevLess" size="5" th:value="${pairsClassifyVO.vcoreqlevLess}"/></td>
+                </tr>
+                <tr>
+                    <td>左三角可靠度平均值区间</td>
+                    <td><input type="text" id="ldeltaqlev" name="ldeltaqlev" size="5" th:value="${pairsClassifyVO.ldeltaqlev}"/>-<input type="text" id="ldeltaqlevLess" name="ldeltaqlevLess" size="5" th:value="${pairsClassifyVO.ldeltaqlevLess}"/></td>
+                    <td>右三角可靠度平均值区间</td>
+                    <td><input type="text" id="rdeltaqlev" name="rdeltaqlev" size="5" th:value="${pairsClassifyVO.rdeltaqlev}"/>-<input type="text" id="rdeltaqlevLess" name="rdeltaqlevLess" size="5" th:value="${pairsClassifyVO.rdeltaqlevLess}"/></td>
+                </tr>
+                <tr>
+                    <td colspan="3"><input class="btn btn-default" type="submit" value="查询"/><input class="btn btn-default" type="button" id="reset" value="重置"/></td>
+                    <td><input class="btn btn-success" type="button" id="addQueryQueue" value="加入队列"/></td>
+                </tr>
+            </table>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <td>序号</td>
+                <td>查询卡</td>
+                <td>比中卡</td>
+                <td>得分</td>
+            </tr>
+            </thead>
+            <tbody id="classifyTTTableBody"></tbody>
+        </table>
+        <ul class="pager">
+            <li><a href="javascript:void(0)" onclick="choicePage('pre')">上一页</a></li>
+            <li><a href="javascript:void(0)" onclick="choicePage('next')">下一页</a></li>
+            <li id="ttTotal"></li>
+        </ul>
+    </div>
+</div>
+
+<div class="panel panel-success col-md-6">
+    <div class="panel-heading">
+        <h3 class="panel-title">发送查询</h3>
+    </div>
+    <div class="panel-body">
+        <form method="post" role="form" action="/One/match/send">
+            <table class="table" id="sendQueryTable">
+                <tr>
+                    <td>优先级数： <input type="text" id="priority" name="priority" value="3" size="5"/></td>
+                    <td>最小得分： <input type="text" id="minScore" name="minScore" value="0" size="5"/></td>
+                    <td>最大候选： <input type="text" id="minCandNum" name="maxCandNum" value="50" size="5"/></td>
+                    <td>TT阀值： <input type="text" id="threshold" name="threshold" value="60" size="5"/></td>
+                </tr>
+                <tr>
+                    <td>比对类型</td>
+                    <td colspan="3">
+                        <input type="radio" name="queryType" value="0" checked="checked"/> 查重(TT)
+                        <input type="radio" name="queryType" value="1"/> 倒查(TL)
+                        <input type="radio" name="queryType" value="2"/> 正查(LT)
+                        <input type="radio" name="queryType" value="3"/> 串查(LL)
+                    </td>
+                </tr>
+                <tr>
+                    <td>备注</td>
+                    <td colspan="3"><textarea id="description" name="description" class="form-control"></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="3"><input class="btn btn-default" type="submit" value="发送"/></td>
+                    <td><input class="btn btn-danger" type="button" id="clearQueryQueue" value="清空队列"/></td>
+                </tr>
+            </table>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <td>序号</td>
+                <td>查询卡</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody id="queryQueueTable"></tbody>
+        </table>
+        <ul class="pager">
+            <li><a href="javascript:void(0)" onclick="choiceSendKeyPage('pre')">上一页</a></li>
+            <li><a href="javascript:void(0)" onclick="choiceSendKeyPage('next')">下一页</a></li>
+            <li id="sendKeyTotal"></li>
+        </ul>
+    </div>
+</div>
+
+
+</body>
+</html>

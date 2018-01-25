@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>比对测试</title>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap-theme.css"/>
+    <script type="text/javascript" src="/One/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/One/bootstrap3/js/bootstrap.js"></script>
+</head>
+<body>
+    <div id="functionDiv">
+        <h1 th:inline="text">北京市局掌纹测试</h1>
+        <ul id="choiceTab" class="nav nav-tabs">
+            <li class="active"> <a href="#gzPalm" data-toggle="tab"> 贵州库掌纹重提 </a> </li>
+            <li> <a href="#bjsjPalm" data-toggle="tab"> 市局掌纹入库 </a> </li>
+        </ul>
+
+        <div class="tab-pane fade in active" id="gzPalm">
+            <div class="panel-group" id="bjsjAccordion">
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#bjsjAccordion" href="#gzPlamReExtractorDiv">
+                        <h3 class="panel-title">181库贵州掌纹重提特征</h3>
+                    </div>
+                    <div id="gzPlamReExtractorDiv" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/bjsj/gz_palm">
+                                <div class="form-group">
+                                    <input type="file" id="gzPalmKeyFile" name="gzPalmKeyFile"/>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="bjsjPalm">
+            <div class="panel-group" id="bjsjPalmAccordion">
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#bjsjAccordion" href="#gzPlamReExtractorDiv">
+                        <h3 class="panel-title">市局掌纹入库</h3>
+                    </div>
+                    <div id="bjsjPalmReExtractorDiv" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/bjsj/gz_palm">
+                                <div class="form-group">
+                                    <input type="file" id="bjsjPalmKeyFile" name="bjsjPalmKeyFile"/>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>比对测试</title>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap-theme.css"/>
+    <script type="text/javascript" src="/One/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/One/bootstrap3/js/bootstrap.js"></script>
+
+    <script th:inline="javascript">
+        var fptResultTimer;
+        var fptErrorResultTimer;
+        var matchSendResultTimer;
+        var matchSendErrorResultTimer;
+        $(function () {
+            var s = [[${showTab}]];
+            $('#choiceTab a[href="#'+s+'"]').tab('show');
+            var totalPages = [[${queryqueList.totalPages}]];
+            var number = [[${queryqueList.number}]];
+            $('#queryQueueTotal').text("总共 "+totalPages+" 页,当前第 "+(number+1)+" 页");
+            $('#batchSend').attr("checked",false);
+            $('#batchSend').click(function(){
+                $('#queryFile').val('');
+                $('#keyId').val('');
+                if ($(this).is(":checked")) {
+                    $('#singleSendDiv').hide();
+                    $('#batchSendDiv').show();
+                } else {
+                    $('#singleSendDiv').show();
+                    $('#batchSendDiv').hide();
+                }
+            });
+
+            startFPTTime();
+            startMatchSendTime();
+
+        });
+
+        function choicePage(type) {
+            var totalPages = [[${queryqueList.totalPages}]];
+            var number = [[${queryqueList.number}]];
+            if (type == 'next') {
+                if (number >= (totalPages-1)) return false;
+                else number = number+1;
+            } else {
+                if (number > 0) number = number-1;
+                else return false;
+            }
+            var url = "/One/index/match/"+number+"/10";
+            $('#queryQueueForm').attr('action',url);
+            $('#queryQueueForm').submit();
+        }
+
+        function showAnalyzeModal(pkId,queryType) {
+            var width = screen.width;
+            var height = screen.height;
+            var analyzePkIdWithQueryType = pkId+"-"+queryType;
+            var url = "/One/match/toAnalyzePage?analyzePkIdWithQueryType="+analyzePkIdWithQueryType;
+            window.open(url,"","width=" + width + "px,height=" + height + "px,top=0,left=0,location=no,directories=no,menubar=no,toolbar=no");
+            //window.showModalDialog(url,pkId,'location=1;titlebar=no;scroll=0;status=0;dialogWidth='+width+'px;dialogHeight='+height+'px;location=0;status=0;help:no;toolbar=0;menubar=0;');
+        }
+
+        function startFPTTime() {
+            fptResultTimer = setInterval("getFPTResult()",5000);
+            fptErrorResultTimer = setInterval("getFPTErrorResult()",5000);
+
+        }
+        function stopFPTTime() {
+            clearInterval(fptResultTimer);
+            clearInterval(fptErrorResultTimer);
+        }
+
+        function startMatchSendTime() {
+            matchSendResultTimer = setInterval("getMatchSendResult()",5000);
+            matchSendErrorResultTimer = setInterval("getMatchSendErrorResult()",5000);
+
+        }
+        function stopMatchSendTime() {
+            clearInterval(matchSendResultTimer);
+            clearInterval(matchSendErrorResultTimer);
+        }
+
+
+
+        function getMatchSendResult() {
+            $.ajax({
+                type:"GET",
+                dataType:"text",
+                url:'/One/match/send/result',
+                success: function(data){
+                    if (data != "") {
+                        $('#progressQueryDiv').show();
+                        var processMessage = data.split(":");
+                        var total = parseInt(processMessage[0]);
+                        var current = parseInt(processMessage[1]);
+                        var rate = current/total*100;
+                        $('#processQueryBar').css("width",rate+"%");
+                        $('#showQueryResultDiv').html("<h5>"+data+"</h5>");
+                        if (total == current) {
+                            stopMatchSendTime();
+                            $('#showQueryResultDiv').html("<h5>比对发送完成!</h5>");
+                        }
+                    }
+                }
+            });
+        }
+
+        function getMatchSendErrorResult() {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: '/One/match/send/error',
+                success: function (data) {
+                    /*var last = JSON.stringify(data);
+                     console.log(last);*/
+                    if (data != "") {
+                        var errorTotal = parseInt(data[0]);
+                        if(errorTotal > 0) {
+                            $('#errorQueryTotal').html("错误总数 : "+errorTotal);
+                            var html = "";
+                            var errorDetail = data[1];
+                            for (e in errorDetail) {
+                                html += errorDetail[e]+"<BR/>";
+                            }
+                            $('#processQueryErrorDiv').html(html);
+                        }
+                    }
+                }
+            });
+        }
+
+        function getFPTResult() {
+            $.ajax({
+                type:"GET",
+                dataType:"text",
+                url:'/One/fpt/upload/result',
+                success: function(data){
+                    if (data != "") {
+                        $('#progressFPTDiv').show();
+                        var processMessage = data.split("|");
+                        var msg = processMessage[0];
+                        var totalAndCurrent = msg.split(":");
+                        var total = parseInt(totalAndCurrent[0]);
+                        var current = parseInt(totalAndCurrent[1]);
+                        var rate = current/total*100;
+                        $('#processBar').css("width",rate+"%");
+                        $('#showResultDiv').html("<h5>"+data+"</h5>");
+                        if (total == current) {
+                            stopFPTTime();
+                            $('#showResultDiv').html("<h5>入库完成!</h5>");
+                        }
+                    }
+                }
+            });
+        }
+
+        function getFPTErrorResult() {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: '/One/fpt/upload/error',
+                success: function (data) {
+                    if (data != "") {
+                        var errorTotal = parseInt(data[0]);
+                        if(errorTotal > 0) {
+                            $('#errorTotal').html("错误总数 : "+errorTotal);
+                            var html = "";
+                            var errorDetail = data[1];
+                            for (e in errorDetail) {
+                                html += errorDetail[e]+"<BR/>";
+                            }
+                            $('#processErrorDiv').html(html);
+                        }
+                    }
+                }
+            });
+        }
+
+        function showClassifyModal(){
+            var width = screen.width;
+            var height = screen.height;
+            var url = "/One/classify";
+            window.open(url,"","width=" + width + "px,height=" + height + "px,top=0,left=0,location=no,directories=no,menubar=no,toolbar=no");
+        }
+
+    </script>
+</head>
+<body>
+<div id="functionDiv">
+    <h1 th:inline="text">测试平台</h1>
+    <ul id="choiceTab" class="nav nav-tabs">
+        <li class="active"><a href="#query" data-toggle="tab">发送比对</a></li>
+        <li> <a href="#match" data-toggle="tab"> 比对结果 </a> </li>
+        <li> <a href="#fpt" data-toggle="tab"> FPT入库 </a> </li>
+    </ul>
+    <div id="choiceTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="query">
+            <div>
+                <a th:href="@{/classify}">查重对子查询</a>
+                <a th:attr="onclick='javascript:showClassifyModal()'" href="javascript:void(0)">正查对子查询</a>
+            </div>
+            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/match/send">
+                <div class="form-group">
+                    <div id="singleSendDiv">
+                        <input type="text" class="form-control" id="keyId" name="keyId" placeholder="输入卡号"/>
+                    </div>
+                    <div id="batchSendDiv" style="display: none">
+                        <input type="file" id="queryFile" name="queryFile"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="batchSend" /> <span id="batchSendSpan">批量发送</span>
+                    </label>
+                    <label>比对类型:</label>
+                    <label class="radio-inline">
+                        <input type="radio" name="queryType" value="0" checked="checked"/> 查重(TT)
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="queryType" value="1"/> 倒查(TL)
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="queryType" value="2"/> 正查(LT)
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="queryType" value="3"/> 串查(LL)
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="name">TT阀值</label>
+                    <input type="text" id="threshold" name="threshold" value="60" size="5"/>
+                    <label for="name">最小得分</label>
+                    <input type="text" id="minScore" name="minScore" value="0" size="5"/>
+                    <label for="name">最大候选</label>
+                    <input type="text" id="minCandNum" name="maxCandNum" value="50" size="5"/>
+                    <label for="name">优先级数</label>
+                    <input type="text" id="priority" name="priority" value="3" size="5"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">备注</label>
+                    <textarea id="description" name="description" class="form-control"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">提交</button>
+            </form>
+            <div id="errorQueryDiv"><h1 th:text="${queryMessage}"></h1></div>
+            <div class="panel panel-success col-md-6" style="height: 70%">
+                <div class="panel-heading">
+                    <h3 class="panel-title">处理进度</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="progress progress-striped active" id="progressQueryDiv" style="display: none">
+                        <div id="processQueryBar" class="progress-bar progress-bar-success"
+                             role="progressbar" style="width: 0%;">
+                        </div>
+                    </div>
+                    <div id="showQueryResultDiv">
+                        <h5 th:text="${queryResult}"></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-danger col-md-6" style="height: 70%">
+                <div class="panel-heading">
+                    <h3 class="panel-title">失败列表</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="errorQueryTotal"></div>
+                    <div id="processQueryErrorDiv"></div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="match">
+            <div class="panel-group" id="accordion">
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#queryQueueDiv">
+                        <h3 class="panel-title">比对任务队列</h3>
+                    </div>
+                    <div id="queryQueueDiv" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <form method="get" class="form-inline" role="form" id="queryQueueForm">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <!--<th>任务开始时间</th>-->
+                                        <th>任务总数</th>
+                                        <th>任务号区间</th>
+                                        <th>比对类型</th>
+                                        <th>优先级</th>
+                                        <!--<th>任务状态</th>-->
+                                        <th>比对状态</th>
+                                        <th>比对开始时间</th>
+                                        <th>比对结束时间</th>
+                                        <th>比对速度</th>
+                                        <th>任务详情</th>
+                                        <th>任务比对分析</th>
+                                    </tr>
+                                    </thead>
+                                    <tr th:each="queryque:${queryqueList}">
+                                        <td th:text="${queryqueStat.index+1}"></td>
+                                        <!--<td th:text="${queryque.beginTime}"></td>-->
+                                        <td th:text="${queryque.total}"></td>
+                                        <td><span th:text="${queryque.orasidStart}"></span>-<span th:text="${queryque.orasidEnd}"></span></td>
+                                        <td th:switch="${queryque.querytype}">
+                                            <span th:case="'0'">查重(TT)</span>
+                                            <span th:case="'1'">倒查(TL)</span>
+                                            <span th:case="'2'">正查(LT)</span>
+                                            <span th:case="'3'">串查(LL)</span>
+                                        </td>
+                                        <td th:text="${queryque.priority}"></td>
+                                        <!--<td th:switch="${queryque.statues}">
+                                            <span th:case="'0'">正在发送</span>
+                                            <span th:case="'1'">发送完成</span>
+                                        </td>-->
+                                        <td th:switch="${queryque.matchStatues}">
+                                            <span th:case="'0'">正在比对</span>
+                                            <span th:case="'1'">完成比对</span>
+                                        </td>
+                                        <td th:text="${queryque.matchBeginTime}"></td>
+                                        <td th:text="${queryque.matchFinishTime}"></td>
+                                        <td th:text="${queryque.algotithmQuerySpeed}"></td>
+
+                                        <!--<td th:text="${queryque.description!=null ? (#strings.substring(queryque.description,0,5)) : queryque.description}"></td>-->
+                                        <td th:text="${queryque.description}"></td>
+                                        <td>
+                                            <a th:href="@{/match/produceMatchResultFromQuery(pkid=${queryque.pkid})}">导出候选</a>
+                                            <a th:attr="onclick='javascript:showAnalyzeModal(\''+${queryque.pkid}+'\',\''+${queryque.querytype}+'\')'" href="javascript:void(0)">分析结果</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                            <ul class="pager">
+                                <li><a href="/One/index/match/0/10">刷新</a></li>
+                                <li><a href="javascript:void(0)" onclick="choicePage('pre')">上一页</a></li>
+                                <li><a href="javascript:void(0)" onclick="choicePage('next')">下一页</a></li>
+                                <li id="queryQueueTotal"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#candResultDiv">
+                        <h3 class="panel-title">导出候选结果</h3>
+                    </div>
+                    <div id="candResultDiv" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/match/produce">
+                                <div class="form-group">
+                                    <label for="name">保存文件名</label>
+                                    <input type="text" class="form-control" id="zipName" name="zipName" value="default"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>任务号区间</label>
+                                    <input type="text" id="oraSidS" name="oraSidS" size="10"/>
+                                    -
+                                    <input type="text" id="oraSidE" name="oraSidE" size="10"/>
+                                    <label>候选得分区间</label>
+                                    <input type="text" id="candMinScore" name="candMinScore" size="10" value="0"/>
+                                    -
+                                    <input type="text" id="candMaxScore" name="candMaxScore" size="10" value="100"/>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#exportFPTDiv">
+                        <h3 class="panel-title">导出FPT文件</h3>
+                    </div>
+                    <div id="exportFPTDiv" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/fpt/export">
+                                <div class="form-group">
+                                    <label for="name">文件服务器地址</label>
+                                    <input type="text" class="form-control" id="fptPathServer" name="fptPathServer" value="http://10.1.7.204/fpt/"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="keyFile">文件输入</label>
+                                    <input type="file" id="keyFile" name="keyFile"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="fptType" value="template" checked="checked"/> 档案FPT
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="fptType" value="latent"/> 现场FPT
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#validKeysDiv">
+                        <h3 class="panel-title">验证列表卡号</h3>
+                    </div>
+                    <div id="validKeysDiv" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/match/validKeys">
+                                <div class="form-group">
+                                    <input type="file" id="validFile" name="validFile"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="validKeyType" value="0" checked="checked"/> TT
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="validKeyType" value="1"/> TL
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="validKeyType" value="2"/> LT
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="validKeyType" value="3"/> LL
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#validSyncDiv">
+                        <h3 class="panel-title">验证分库数据</h3>
+                    </div>
+                    <div id="validSyncDiv" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/match/validSync">
+                                <div class="form-group">
+                                    <label for="syncUrl">分库服务器</label>
+                                    <input type="text" class="form-control" id="syncUrl" name="syncUrl" value="http://10.1.7.204:10010/GetSyncData"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="validSyncFile">文件输入</label>
+                                    <input type="file" id="validSyncFile" name="validSyncFile"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataType">数据类型</label>
+                                    <select id="dataType" name="dataType" class="form-control">
+                                        <option value="person">person</option>
+                                        <option value="template_finger">template_finger</option>
+                                        <option value="latent_finger">latent_finger</option>
+                                    </select>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isRidge" value="false" checked="checked"/> 非纹线数据
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isRidge" value="true"/> 纹线数据
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                            <div><h5 th:text="${reSyncResult}"></h5></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#reSyncDiv">
+                        <h3 class="panel-title">特征重新分库</h3>
+                    </div>
+                    <div id="reSyncDiv" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/match/reSync">
+                                <div class="form-group">
+                                    <input type="file" id="syncFile" name="syncFile"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="syncType" value="person" checked="checked"/> 人员
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="syncType" value="templateFinger"/> 捺印
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="syncType" value="caseFinger"/> 现场
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-default">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="fpt">
+            <form method="post" class="form-inline" enctype="multipart/form-data" role="form" action="/One/fpt/upload">
+                <div class="form-group">
+                    <label for="name">文件服务器地址</label>
+                    <input type="text" class="form-control" id="name" name="fileServer" value="http://10.1.7.204/fpt/data"/>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="inputfile">文件输入</label>
+                    <input type="file" id="inputfile" name="inputfile"/>
+                </div>
+                <div class="form-group">
+                    <label class="radio-inline">
+                        <input type="radio" name="coverFPT" value="sample" checked="checked"/> 标准入库
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="coverFPT" value="cover"/> 覆盖入库
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-default">提交</button>
+            </form>
+            <div id="errorDiv"><h1 th:text="${message}"></h1></div>
+
+            <div class="panel panel-success col-md-6" style="height: 70%">
+                <div class="panel-heading">
+                    <h3 class="panel-title">处理进度</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="progress progress-striped active" id="progressFPTDiv" style="display: none">
+                        <div id="processBar" class="progress-bar progress-bar-success"
+                             role="progressbar" style="width: 0%;">
+                        </div>
+                    </div>
+                    <div id="showResultDiv">
+                        <h5 th:text="${result}"></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-danger col-md-6" style="height: 70%">
+                <div class="panel-heading">
+                    <h3 class="panel-title">失败列表</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="errorTotal"></div>
+                    <div id="processErrorDiv"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

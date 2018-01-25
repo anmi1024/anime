@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Created by wangjue on 2017/8/28.
  */
-@Component
+//@Component
 public class PrintTime {
     private Logger logger = Logger.getLogger(this.getClass());
 

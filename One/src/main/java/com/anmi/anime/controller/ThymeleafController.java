@@ -24,13 +24,13 @@ public class ThymeleafController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping("index")
+    @RequestMapping("thymeleafIndex")
     public String index(Model model){
         model.addAttribute("message","welcome to hell!");
         return "/index";
     }
 
-    @RequestMapping("login")
+    @RequestMapping("thymeleafLogin")
     public String hello(){
         logger.debug("This is a debug message");
         logger.info("This is an info message");

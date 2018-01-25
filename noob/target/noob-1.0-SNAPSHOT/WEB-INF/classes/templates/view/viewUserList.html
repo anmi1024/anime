@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>user list</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>index</td>
+            <td>userName</td>
+            <td>passWord</td>
+            <td>name</td>
+            <td>gender</td>
+            <td>age</td>
+        </tr>
+        <tr th:each="user,iterStat :${users}">
+            <td th:text="iterStat.index"></td>
+            <td th:text="${user.userName}"></td>
+            <td th:text="${user.passWord}"></td>
+            <td th:text="${user.name}"></td>
+            <td th:text="${user.gender}"></td>
+            <td th:text="${user.age}"></td>
+
+        </tr>
+    </table>
+
+</body>
+</html>

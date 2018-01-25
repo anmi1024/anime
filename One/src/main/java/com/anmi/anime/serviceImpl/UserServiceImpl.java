@@ -1,7 +1,7 @@
 package com.anmi.anime.serviceImpl;
 
-import com.anmi.anime.domain.authorize.repository.UserRepository;
-import com.anmi.anime.domain.authorize_gz.repository.UserGZRepository;
+import com.anmi.anime.repository.authorize.UserRepository;
+import com.anmi.anime.repository.authorize_gz.UserGZRepository;
 import com.anmi.anime.model.User;
 import com.anmi.anime.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

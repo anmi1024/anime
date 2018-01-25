@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.anmi.anime</groupId>
   <artifactId>One</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <name>One</name>
   <url>http://maven.apache.org</url>
 
@@ -16,6 +16,13 @@
   </parent>
 
   <dependencies>
+    <!-- tomcat相关  -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -23,11 +30,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -40,8 +42,8 @@
       </exclusions>
     </dependency>
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-thymeleaf</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -54,6 +56,13 @@
       <artifactId>spring-boot-devtools</artifactId>
       <optional>true</optional>
     </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.3.3</version>
+    </dependency>
+
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
@@ -61,8 +70,8 @@
     </dependency>
     <dependency>
       <groupId>com.oracle</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <version>10.2.0.3</version>
+      <artifactId>ojdbc6</artifactId>
+      <version>11.2.0.3.0</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
@@ -76,6 +85,123 @@
       <version>1.1.5.RELEASE</version>
     </dependency>
 
+    <!-- io -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+    </dependency>
+    <!-- netty -->
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty</artifactId>
+      <version>3.10.5.Final</version>
+    </dependency>
+    <!-- FOR ZIP -->
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.10.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.3.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.3.2</version>
+    </dependency>
+    <!-- nirvana -->
+    <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-protocol</artifactId>
+      <version>dev-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ganshane.monad</groupId>
+      <artifactId>monad-rpc</artifactId>
+      <version>5.0.16</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javassist</artifactId>
+          <groupId>javassist</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-c</artifactId>
+      <version>dev-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-support</artifactId>
+      <version>dev-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-extractor</artifactId>
+      <version>dev-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-image</artifactId>
+      <version>dev-SNAPSHOT</version>
+    </dependency>
+
+    <!-- hbase -->
+    <dependency>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.4.10</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-common</artifactId>
+      <version>1.3.1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>tomcat</artifactId>
+          <groupId>jasper-runtime</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>tomcat</artifactId>
+          <groupId>jasper-compiler</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>javax.servlet</artifactId>
+          <groupId>jsp-api</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>javax.servlet</artifactId>
+          <groupId>servlet-api</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-protocol</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-client</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
   </dependencies>
 
   <properties>
@@ -85,18 +211,18 @@
 
   <build>
     <plugins>
-        <plugin>
+      <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <configuration>
-                <fork>true</fork>
-                <executable>true</executable>
-            </configuration>
-        </plugin>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <fork>true</fork>
+          <executable>true</executable>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

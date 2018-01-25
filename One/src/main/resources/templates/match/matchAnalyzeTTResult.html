@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>TT比对结果分析展示页</title>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="/One/bootstrap3/css/bootstrap-theme.css"/>
+    <script type="text/javascript" src="/One/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/One/bootstrap3/js/bootstrap.js"></script>
+
+    <script th:inline="javascript">
+        var lostList = [];
+        var missList = [];
+        var matchList = [];
+        var pageNum = 1;
+        $(function(){
+            var viewResult = [[${viewResult}]];
+            var analyzePkId = [[${analyzePkId}]];
+            $('#analyzePkId').val(analyzePkId);
+            if (viewResult == "true") {
+                $('#analyzeResultView').show();
+                lostList = [[${analyzeVO.lostList}]];
+                missList = [[${analyzeVO.missList}]];
+                matchList = [[${analyzeVO.matchList}]];
+                lostOrMissListPage(pageNum,'lost');
+                lostOrMissListPage(pageNum,'miss');
+                lostOrMissListPage(pageNum,'match');
+                $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                    pageNum = 1;
+                    lostOrMissListPage(pageNum,'lost');
+                    lostOrMissListPage(pageNum,'miss');
+                    lostOrMissListPage(pageNum,'match');
+                });
+            }
+        });
+
+        function choicePage(type,lostOrMiss) {
+            var total = 0;
+            if (lostOrMiss == "lost") total = lostList.length;
+            else if (lostOrMiss == "miss") total = missList.length;
+            else total = matchList.length;
+            var pageCount = parseInt(total/10);
+            if (total%10 != 0)  pageCount = pageCount + 1;
+            if (type == "pre") {
+                if (pageNum > 1)  pageNum = pageNum -1;
+                else return false;
+            } else {
+                if (pageNum >= pageCount) return false;
+                else pageNum = pageNum + 1;
+            }
+            lostOrMissListPage(pageNum,lostOrMiss);
+        }
+
+        function lostOrMissListPage(currentPage,lostOrMissOrMatch) {
+            var pageTotal = 0;
+            if (currentPage > 1) pageTotal = (currentPage-1)*10;
+            var tr = "";
+            var nums = [0,1,2,3,4,5,6,7,8,9];
+            for (var i in nums)
+            {
+                var n = parseInt(i);
+                var index = n+pageTotal;
+                var lostOrMissOrMatchInfo = "";
+                if (lostOrMissOrMatch == "lost") lostOrMissOrMatchInfo = lostList[parseInt(index)];
+                else if (lostOrMissOrMatch == "miss") lostOrMissOrMatchInfo = missList[parseInt(index)];
+                else lostOrMissOrMatchInfo = matchList[parseInt(index)];
+                if (lostOrMissOrMatchInfo != null) {
+                    if (lostOrMissOrMatch == "match")
+                        tr += "<tr><td>"+parseInt((n+1)+pageTotal)+"</td><td>"+lostOrMissOrMatchInfo.queryKey+" "+lostOrMissOrMatchInfo.matchKey+" "+lostOrMissOrMatchInfo.score+"</td></tr>";
+                    else
+                        tr += "<tr><td>"+parseInt((n+1)+pageTotal)+"</td><td>"+lostOrMissOrMatchInfo+"</td></tr>";
+                }
+            }
+            if (tr != "") {
+                if (lostOrMissOrMatch == "lost") {
+                    $('#lostTableBody').html(tr);
+                    $('#lostTotal').text("总数:"+lostList.length);
+                } else if (lostOrMissOrMatch == "miss") {
+                    $('#missTableBody').html(tr);
+                    $('#missTotal').text("总数:"+missList.length);
+                } else {
+                    $('#matchTableBody').html(tr);
+                    $('#matchTotal').text("总数:"+matchList.length);
+                }
+            }
+        }
+    </script>
+
+
+</head>
+<body>
+<div id="analyzeFormDiv" class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">TT比对结果分析</h3>
+    </div>
+    <div class="panel-body">
+        <form method="post" class="form-inline" enctype="multipart/form-data" role="form" id="analyzeForm" action="/One/match/analyze">
+            <div class="form-group">
+                <label for="truePairFile">真实对子文件</label>
+            </div>
+            <div class="form-group">
+                <input type="file" id="truePairFile" name="truePairFile"/>
+                <input type="hidden" id="analyzePkId" name="analyzePkId"/>
+            </div>
+            <button type="submit" class="btn btn-default">提交</button>
+        </form>
+    </div>
+</div>
+<div id="analyzeResultView" style="display: none">
+    <div class="panel panel-info">
+        <div class="panel-body">
+            <table class="table">
+                <tr class="success">
+                    <td>任务总数: </td>
+                    <td th:text="${analyzeVO.total}"></td>
+                    <td>比中总数: </td>
+                    <td th:text="${analyzeVO.matchCount}"></td>
+                    <td>错比总数: </td>
+                    <td th:text="${analyzeVO.missCount}"></td>
+                    <td>漏比总数: </td>
+                    <td th:text="${analyzeVO.lostCount}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <ul id="ttAnalyzeMissAndLostTab" class="nav nav-tabs">
+                <li class="active"><a href="#lost" data-toggle="tab">漏比列表</a></li>
+                <li> <a href="#miss" data-toggle="tab">错比列表</a> </li>
+                <li> <a href="#match" data-toggle="tab">比中列表</a> </li>
+            </ul>
+            <div id="choiceTabContent" class="tab-content">
+                <div class="tab-pane fade in active" id="lost">
+                    <table class="table text-center">
+                        <tr>
+                            <td>序号</td>
+                            <td>查询卡 比中卡</td>
+                        </tr>
+                        <tbody id="lostTableBody"></tbody>
+                    </table>
+                    <ul class="pager">
+                        <li th:if="${analyzeVO.lostList} != null"> <a href="#" th:href="@{/match/analyze/download(analyzeFilePath=${analyzeVO.lostFilePath})}">下载列表</a> </li>
+                        <li><a href="javascript:void(0)" onclick="choicePage('pre','lost')">上一页</a></li>
+                        <li><a href="javascript:void(0)" onclick="choicePage('next','lost')">下一页</a></li>
+                        <li id="lostTotal"></li>
+                    </ul>
+                </div>
+                <div class="tab-pane fade" id="miss">
+                    <table class="table text-center">
+                        <tr>
+                            <td>序号</td>
+                            <td>查询卡 比中卡</td>
+                        </tr>
+                        <tbody id="missTableBody"></tbody>
+                    </table>
+                    <ul class="pager">
+                        <li th:if="${analyzeVO.missList} != null"> <a href="#" th:href="@{/match/analyze/download(analyzeFilePath=${analyzeVO.missFilePath})}">下载列表</a> </li>
+                        <li><a href="javascript:void(0)" onclick="choicePage('pre','miss')">上一页</a></li>
+                        <li><a href="javascript:void(0)" onclick="choicePage('next','miss')">下一页</a></li>
+                        <li id="missTotal"></li>
+                    </ul>
+                </div>
+                <div class="tab-pane fade" id="match">
+                    <table class="table text-center">
+                        <tr>
+                            <td>序号</td>
+                            <td>查询卡 比中卡</td>
+                        </tr>
+                        <tbody id="matchTableBody"></tbody>
+                    </table>
+                    <ul class="pager">
+                        <li th:if="${analyzeVO.matchList} != null"> <a href="#" th:href="@{/match/analyze/download(analyzeFilePath=${analyzeVO.matchFilePath})}">下载列表</a> </li>
+                        <li><a href="javascript:void(0)" onclick="choicePage('pre','match')">上一页</a></li>
+                        <li><a href="javascript:void(0)" onclick="choicePage('next','match')">下一页</a></li>
+                        <li id="matchTotal"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7"> </div>
+    </div>
+</div>
+</body>
+</html>

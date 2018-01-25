@@ -1,0 +1,21 @@
+server:
+  port: 8000
+  tomcat: uri-encoding:utf-8
+spring:
+  thymeleaf:
+   cache: false
+   prefix: classpath:/templates/
+   suffix: .html
+   encoding: UTF-8
+   content-type: text/html
+   mode: HTML5
+logging:
+  file: /logging/anime/One/application.log
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+    file: "%d %-5level [%thread] %logger : %msg%n"
+  level:
+      root: ERROR
+      org.springframework.web: ERROR
+      org.hibernate: ERROR
+      com.anmi.anime: INFO

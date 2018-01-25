@@ -10,17 +10,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 /**
  * Created by wangjue on 2017/8/22.
  */
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @RequestMapping("/")
+    public String index() {
+        return "/showAllUser";
+    }
 
     @RequestMapping("/showAllUser")
     public List<User> getAllUser(){
